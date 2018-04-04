@@ -1,6 +1,7 @@
 package com.example.oguro_shiyu.oguroapp01
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
@@ -108,6 +109,13 @@ class LoginActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT).show()
                     }
                 }
+    }
+
+    private fun updateUserInfoAndUI() {
+        //start next activity
+        val intent = Intent(this@CreateAccountActivity, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
     }
 
 }
