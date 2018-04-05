@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout... xmlns:android="http://schemas.android.com/apk/res/android" 
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent" android:layout_width="match_parent">
     <EditText
         android:id="@+id/et_first_name"
@@ -36,4 +36,4 @@
         android:text="@string/create_act"
         android:textColor="@android:color/white"
         android:textStyle="bold" />
-</RelativeLayout...>
+</RelativeLayout>
