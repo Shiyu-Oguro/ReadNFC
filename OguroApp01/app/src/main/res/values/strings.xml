@@ -6,6 +6,7 @@
     <string name="last_name">Last Name</string>
     <string name="login_title">Login</string>
     <string name="create_act">Create Account</string>
-    <string name="etEmail" />
-    <string name="etPassword" />
+    <string name="etEmail">Email</string>
+    <string name="etPassword">Password</string>
+    <string name="send_password_reset_email">Send Password Reset Email</string>
 </resources>
