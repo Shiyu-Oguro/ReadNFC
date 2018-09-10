@@ -30,7 +30,7 @@
         android:clickable="true"
         android:gravity="center_horizontal"
         android:text="Forgot Password?"
-        android:textSize="20sp" />
+        android:textSize="21sp" />
     <Button
         android:id="@+id/btn_register_account"
         style="@style/viewCustom"
