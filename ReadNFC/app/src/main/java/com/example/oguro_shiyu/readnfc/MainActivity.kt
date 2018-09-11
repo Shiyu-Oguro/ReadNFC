@@ -1,6 +1,7 @@
 package com.example.oguro_shiyu.readnfc
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.nfc.NfcAdapter
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private var mAdapter: NfcAdapter? = null
     private var pendingIntent: PendingIntent? = null
     private val nfcReader = NfcReader()
+    //private val getTag = null
 
     companion object {
         const val GET_TAG = "com.shiyu.GET_TAG"
@@ -68,7 +70,18 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         // IntentにTagの基本データが入ってくるので取得。
         val getTag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
+        val textStart = findViewById<TextView>(R.id.textViewNFCdata)
 
+        val ndef = NfcF.get(getTag)
+        if(ndef != null) {
+            ndef.connect()
+            if (ndef.isConnected) {
+                textStart.text = "タッチしました"
+            }
+        }else{
+            textStart.text= "No Connect ..... "
+            return
+        }
         /*
         // ここで取得したTagを使ってデータの読み書きを行う。
         val textView = findViewById<TextView>(R.id.textViewNFCdata)
@@ -85,9 +98,41 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "タッチしました", Toast.LENGTH_LONG).show()
         }*/
         val intent = Intent(this, SelectActivity::class.java)
-        intent.putExtra(EXTRA_MESSAGE, message)
+        //intent.putExtra(EXTRA_MESSAGE, message)
+        intent.putExtra("ARG","カードを抜いてください"); // 引数渡しする場合はIntentクラスのputExtraメソッド経由で渡す
         //intent.putExtra(GET_TAG,getTag)
-        startActivity(intent)
+        startActivityForResult(intent,REQUEST_CODE)
+    }
+
+    //このActivityに戻って来た時の処理
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        // 注意：superメソッドは呼ぶようにする
+        // Activity側のonActivityResultで呼ばないとFragmentのonActivityResultが呼ばれない
+        super.onActivityResult(requestCode, resultCode, data)
+        val textFinish = findViewById<TextView>(R.id.textViewNFCdata)
+        //val getTag2 = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
+
+        when (requestCode) {
+            REQUEST_CODE ->
+                // 呼び出し先のActivityから結果を受け取る
+                if (resultCode == Activity.RESULT_OK) {
+                    val result = data.getStringExtra("RESULT")
+                    //Log.d("ログ", result)
+                    textFinish.text = result.toString()
+                    //val ndef = NfcF.get(getTag2)
+                    /*if(ndef != null) {
+                        ndef.connect()
+                        if (ndef.isConnected) {
+                            textFinish.text = "タッチしました"
+                        }
+                    }else{
+                        textFinish.text= "No Connect ..... "
+                        return
+                    }*/
+                }
+            else -> {
+            }
+        }
     }
 
     @SuppressLint("MissingPermission")

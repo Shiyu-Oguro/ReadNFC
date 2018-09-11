@@ -1,5 +1,6 @@
 package com.example.oguro_shiyu.readnfc
 
+import android.app.Activity
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -21,12 +22,15 @@ class SelectActivity : AppCompatActivity() {
 
         // start
         buttonRead1.setOnClickListener {
-            //val intent = Intent(this, MainActivity::class.java)
-            //intent.putExtra(EXTRA_MESSAGE, R.id.message)
-            //intent.putExtra(WorkingActivity.GET_TAG,getTag)
-            val intent = Intent(this, WorkingActivity::class.java)
-            intent.putExtra(EXTRA_MESSAGE, R.id.message)
-            startActivity(intent)
+            val arg = intent.getStringExtra("ARG") // 呼び出し元から引数を受け取る
+            sendResult(arg)
         }
+    }
+
+    fun sendResult(result: String) {
+        val intent = Intent()
+        intent.putExtra("RESULT", result)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
     }
 }
