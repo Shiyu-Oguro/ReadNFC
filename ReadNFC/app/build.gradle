@@ -27,6 +27,11 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:26.0.0-beta1'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.2-4"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.16"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:0.16"
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:0.5'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2'

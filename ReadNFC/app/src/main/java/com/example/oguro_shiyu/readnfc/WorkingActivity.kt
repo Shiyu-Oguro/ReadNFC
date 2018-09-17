@@ -59,7 +59,6 @@ class WorkingActivity : AppCompatActivity() {
         // NfcAdapterを取得
         mAdapter = NfcAdapter.getDefaultAdapter(applicationContext)
 
-
     }
 
     @SuppressLint("MissingPermission")

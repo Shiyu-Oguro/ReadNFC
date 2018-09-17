@@ -9,6 +9,7 @@ import android.content.Intent
 import android.nfc.tech.NfcF
 import android.content.IntentFilter
 import android.app.PendingIntent
+import android.content.Intent.getIntent
 import android.nfc.Tag
 import android.provider.AlarmClock.EXTRA_MESSAGE
 import android.util.Log
@@ -18,8 +19,11 @@ import android.widget.TextView
 import android.widget.Toast
 import com.example.oguro_shiyu.readnfc.R.id.message
 import android.nfc.tech.Ndef
+import android.os.Handler
+import android.provider.Contacts
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.async
 import java.io.IOException
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,6 +34,12 @@ class MainActivity : AppCompatActivity() {
     private var mAdapter: NfcAdapter? = null
     private var pendingIntent: PendingIntent? = null
     private val nfcReader = NfcReader()
+
+    // 1度だけ代入するものはvalを使う
+    val handler = Handler()
+    // 繰り返し代入するためvarを使う
+    var timeValue = 0
+
     //private val getTag = null
 
     companion object {
@@ -37,14 +47,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        //Log.d("print","START !!!1")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //別のアプリケーションにPendingIntentを渡すと、同じアクセス権を与えられる
         pendingIntent = PendingIntent.getActivity(
                 this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0)
 
+        //NDEFペイロードを持つタグが検出されたときにアクティビティを開始する
         val ndef = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED)
+        //val ndef = IntentFilter(NfcAdapter.ACTION_ADAPTER_STATE_CHANGED)
+        val textConnect = findViewById<TextView>(R.id.textConnect)
 
+        //照合する新しいIntentデータ型を追加
         try {
             ndef.addDataType("text/plain")
         } catch (e: IntentFilter.MalformedMimeTypeException) {
@@ -58,6 +74,29 @@ class MainActivity : AppCompatActivity() {
 
         // NfcAdapterを取得
         mAdapter = NfcAdapter.getDefaultAdapter(applicationContext)
+
+        // 1秒ごと(?)に処理を実行
+        val runnable = object : Runnable {
+            override fun run() {
+                Log.d("print","Timer now ..........")
+                timeValue++
+                // 処理
+                //textConnect.text = "Connect Now.."
+                val getTag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
+                val ndef2 = NfcF.get(getTag)
+                if(ndef2 != null) {
+                    ndef2.connect()
+                    if (ndef2.isConnected) {
+                        textConnect.text = "Connect is Succesfull.. !!!"
+                    }
+                }else{
+                    textConnect.text= "No Connect ..... "
+                }
+                handler.postDelayed(this, 100)
+            }
+        }
+        handler.post(runnable)
+
     }
 
     @SuppressLint("MissingPermission")
@@ -76,7 +115,7 @@ class MainActivity : AppCompatActivity() {
         if(ndef != null) {
             ndef.connect()
             if (ndef.isConnected) {
-                textStart.text = "タッチしました"
+                textStart.text = getTag.toString()
             }
         }else{
             textStart.text= "No Connect ..... "
@@ -99,7 +138,7 @@ class MainActivity : AppCompatActivity() {
         }*/
         val intent = Intent(this, SelectActivity::class.java)
         //intent.putExtra(EXTRA_MESSAGE, message)
-        intent.putExtra("ARG","カードを抜いてください"); // 引数渡しする場合はIntentクラスのputExtraメソッド経由で渡す
+        intent.putExtra("ARG","aaa"); // 引数渡しする場合はIntentクラスのputExtraメソッド経由で渡す
         //intent.putExtra(GET_TAG,getTag)
         startActivityForResult(intent,REQUEST_CODE)
     }
@@ -110,7 +149,8 @@ class MainActivity : AppCompatActivity() {
         // Activity側のonActivityResultで呼ばないとFragmentのonActivityResultが呼ばれない
         super.onActivityResult(requestCode, resultCode, data)
         val textFinish = findViewById<TextView>(R.id.textViewNFCdata)
-        //val getTag2 = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
+        //val getTag2 = data.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
+        //textFinish.text = "終わりです！！！"
 
         when (requestCode) {
             REQUEST_CODE ->
@@ -118,7 +158,8 @@ class MainActivity : AppCompatActivity() {
                 if (resultCode == Activity.RESULT_OK) {
                     val result = data.getStringExtra("RESULT")
                     //Log.d("ログ", result)
-                    textFinish.text = result.toString()
+                    //textFinish.text = result.toString()
+                    textFinish.text = "終わりです！"
                     //val ndef = NfcF.get(getTag2)
                     /*if(ndef != null) {
                         ndef.connect()
@@ -134,6 +175,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    //どうすればActiveに検出できるか
+    //どうすれば一定時間間隔で実行できるか
 
     @SuppressLint("MissingPermission")
     override fun onPause() {
